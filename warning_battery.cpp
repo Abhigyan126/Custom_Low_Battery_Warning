@@ -56,9 +56,8 @@ int main() {
     while (true) {
         double batteryPercentage = getBatData();
 
-        if (batteryPercentage < 50) {
+        if (batteryPercentage < 3) {
             sendNotification(batteryPercentage);
-            std::cout << "Low Battery Notification sent successfully." << std::endl;
         }
 
         sleep(60);
