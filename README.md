@@ -21,9 +21,9 @@ Battery Percentage Notifier is a simple C++ program for macOS that notifies you 
 2. Compile the program using the following command:
 
  ```bash
-   g++ -std=c++11 battery_info.cpp -o battery_info -framework CoreFoundation -framework IOKit
+clang++ -o battery_info warning_battery.cpp notification_sender.m -framework IOKit -framework CoreFoundation -framework Foundation -x objective-c++
 ```
 or
 ```bash
-./battery_info <custom limit>
+./battery_info 
  ````
