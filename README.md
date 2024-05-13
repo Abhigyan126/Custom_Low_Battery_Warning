@@ -30,3 +30,28 @@ or
 ```bash
 ./battery_info 
  ````
+To automate startup at Login follow these step 
+1. Open terminal and paste the following code
+```bash
+echo '<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.example.battery_info</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/path/to/your/compiled/program</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+</dict>
+</plist>' > ~/Library/LaunchAgents/com.example.battery_info.plist
+
+```
+2. Replace /path/to/your/compiled/program with binary location
+3. run the following command in terminal
+```bash
+launchctl load /path/to/your/plist/file
+
+```
