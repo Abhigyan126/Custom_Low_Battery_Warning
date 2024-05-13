@@ -4,7 +4,9 @@
 #include <iostream>
 #include <unistd.h>
 
-double getBatData() {
+bool notificationSent = false;
+
+double getBatteryPercentage() {
     CFTypeRef sourceInfo = IOPSCopyPowerSourcesInfo();
     CFArrayRef sourceList = IOPSCopyPowerSourcesList(sourceInfo);
 
@@ -47,17 +49,48 @@ double getBatData() {
     return percent;
 }
 
+bool isCharging() {
+    CFTypeRef blob = IOPSCopyPowerSourcesInfo();
+    CFArrayRef sources = IOPSCopyPowerSourcesList(blob);
+
+    bool isCharging = false;
+
+    if (sources != nullptr) {
+        CFDictionaryRef pSource = nullptr;
+        const void *psValue;
+
+        // Iterate through all power sources
+        for (CFIndex i = 0; i < CFArrayGetCount(sources); ++i) {
+            psValue = CFArrayGetValueAtIndex(sources, i);
+            pSource = IOPSGetPowerSourceDescription(blob, psValue);
+
+            // Check if the power source is currently charging
+            if (CFDictionaryGetValue(pSource, CFSTR(kIOPSIsChargingKey)) != nullptr) {
+                isCharging = CFBooleanGetValue((CFBooleanRef)CFDictionaryGetValue(pSource, CFSTR(kIOPSIsChargingKey)));
+                break;
+            }
+        }
+    }
+
+    CFRelease(blob);
+    CFRelease(sources);
+
+    return isCharging;
+}
+
 extern "C" {
     void sendNotification(double batteryPercentage);
 }
 
 int main() {
-    
     while (true) {
-        double batteryPercentage = getBatData();
+        double batteryPercentage = getBatteryPercentage();
 
-        if (batteryPercentage < 3) {
+        if (batteryPercentage < 3 && batteryPercentage >= 2 && !isCharging() && !notificationSent) {
             sendNotification(batteryPercentage);
+            notificationSent = true;
+        } else if (batteryPercentage >= 3 || batteryPercentage < 2) {
+            notificationSent = false;
         }
 
         sleep(60);
